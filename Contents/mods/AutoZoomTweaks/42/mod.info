@@ -1,0 +1,13 @@
+name=Auto Zoom Tweaks
+id=AutoZoomTweaks
+description=Auto zoom per player: on/off and its own zoom level indoors, in melee, outdoors and in a vehicle (growing with speed), set in Options instead of the vanilla per-player checkboxes. Works in single player and splitscreen.
+author=fullzero
+url=https://github.com/fu11zero/auto-zoom-tweaks
+category=interface
+versionMin=42.21.0
+poster=poster.png
+icon=icon.png
+require=\ZombieBuddy
+javaJarFile=media/java/client/AutoZoomTweaks.jar
+javaPkgName=dev.autozoomtweaks
+ZBVersionMin=2.3.4

@@ -1,0 +1,8 @@
+{
+    "UI_AutoZoomTweaks_on": "On",
+    "UI_AutoZoomTweaks_indoors": "Indoors",
+    "UI_AutoZoomTweaks_melee": "Melee",
+    "UI_AutoZoomTweaks_outdoors": "Outdoors",
+    "UI_AutoZoomTweaks_vehicle": "Vehicle",
+    "UI_AutoZoomTweaks_desc": "Larger = farther. Melee: outside, not running, a zombie close by targets you or did in the last 4 seconds. Vehicle: the Outdoors level standing still, growing with speed up to this level at 80 km/h. Panning the camera zooms out as in vanilla."
+}
