@@ -5,6 +5,8 @@ change notes when the mod is updated. Keep it in English, short, one line per ch
 
 ## Unreleased
 
+- Changed: the Java part is signed by the author (ZombieBuddy shows "FullZero"; trust the author once and mod updates no longer ask for approval).
+
 ## Release: 1 Nov @ 11:53am
 
 - Added: auto zoom per player with its own level indoors, in melee, outdoors and in a vehicle.
