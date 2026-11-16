@@ -5,6 +5,8 @@ change notes when the mod is updated. Keep it in English, short, one line per ch
 
 ## Unreleased
 
+## Update: 16 Nov @ 6:11pm
+
 - Changed: the zoom speeds up and slows down smoothly instead of moving at a fixed speed and turning around at once; no more camera twitching on gas, brake and cruise control.
 - Changed: the vehicle zoom follows the average speed over about a second and a half, not the instant one.
 - Added: vehicleSpeedSmoothing and zoomAcceleration in AutoZoomTweaks.properties.
