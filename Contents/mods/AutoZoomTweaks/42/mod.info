@@ -1,6 +1,6 @@
 name=Auto Zoom Tweaks
 id=AutoZoomTweaks
-description=Auto zoom per player: on/off and its own zoom level indoors, in melee, outdoors and in a vehicle (growing with speed), set in Options instead of the vanilla per-player checkboxes. Works in single player and splitscreen.
+description=Auto zoom per player: on/off and its own zoom level indoors, in melee, outdoors and in a vehicle (growing with speed), with smooth zoom motion that holds still while aiming a firearm, set in Options instead of the vanilla per-player checkboxes. Works in single player and splitscreen.
 author=fullzero
 url=https://github.com/fu11zero/auto-zoom-tweaks
 category=interface

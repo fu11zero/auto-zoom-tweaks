@@ -51,11 +51,38 @@ public final class Settings {
             %s
             # Speed at which the vehicle level is reached, km/h.
             vehicleSpeedKmh=80
+
+            # Smoothing of the vehicle speed, seconds: the zoom follows the average speed, so
+            # touches of gas and brake and cruise control do not twitch the camera. 0 = off.
+            vehicleSpeedSmoothing=1.5
+
+            # How fast the zoom speeds up and slows down, zoom units per second squared (1.0 =
+            # 100%). The top speed is vanilla (0.36 per second). Smaller = softer starts and stops.
+            zoomAcceleration=0.4
+
+            # Aiming a firearm (crosshair): hold the zoom of the current situation, so a zombie
+            # coming close doesn't switch to the melee level while the player lines up a shot.
+            # The situation is checked again aimFreezeDelay seconds after aiming ends.
+            aimFreeze=true
+            aimFreezeDelay=1.0
+
+            # Zoom out while panning the camera (gamepad RB while aiming, the pan camera key):
+            # vanilla = by the pan distance, up to +100%, so the zoom follows the cursor;
+            # fixed = by panZoomAmount percent while the player pans on purpose, and not at all
+            # for the automatic pan toward the mouse cursor while aiming.
+            panZoom=vanilla
+            panZoomAmount=50
             """;
 
     // [player][situation], zoom factor (1.0 = 100%).
     private static volatile float[][] levels;
     public static volatile float vehicleSpeedKmh = 80f;
+    public static volatile float vehicleSpeedSmoothing = 1.5f;
+    public static volatile float zoomAcceleration = 0.4f;
+    public static volatile boolean aimFreeze = true;
+    public static volatile float aimFreezeDelay = 1f;
+    public static volatile boolean panZoomFixed = false;
+    public static volatile float panZoomAmount = 0.5f;
 
     private static Path path;
     private static long lastCheck;
@@ -266,7 +293,23 @@ public final class Settings {
         }
         levels = l;
         vehicleSpeedKmh = num(p, "vehicleSpeedKmh", 80f, 1f, 1000f);
-        sb.append(" vehicleSpeedKmh=").append(vehicleSpeedKmh);
+        vehicleSpeedSmoothing = num(p, "vehicleSpeedSmoothing", 1.5f, 0f, 30f);
+        zoomAcceleration = num(p, "zoomAcceleration", 0.4f, 0.01f, 100f);
+        aimFreeze = bool(p, "aimFreeze", true);
+        aimFreezeDelay = num(p, "aimFreezeDelay", 1f, 0f, 30f);
+        String pan = p.getProperty("panZoom", "vanilla").trim().toLowerCase();
+        if (!pan.equals("vanilla") && !pan.equals("fixed")) {
+            Log.warn("bad panZoom=" + pan + ", using vanilla");
+        }
+        panZoomFixed = pan.equals("fixed");
+        panZoomAmount = num(p, "panZoomAmount", 50f, 0f, 225f) / 100f;
+        sb.append(" vehicleSpeedKmh=").append(vehicleSpeedKmh)
+                .append(" vehicleSpeedSmoothing=").append(vehicleSpeedSmoothing)
+                .append(" zoomAcceleration=").append(zoomAcceleration)
+                .append(" aimFreeze=").append(aimFreeze)
+                .append(" aimFreezeDelay=").append(aimFreezeDelay)
+                .append(" panZoom=").append(panZoomFixed ? "fixed" : "vanilla")
+                .append(" panZoomAmount=").append(Math.round(panZoomAmount * 100f));
         Log.info(sb.toString());
     }
 
@@ -281,6 +324,19 @@ public final class Settings {
                 return n;
             }
         } catch (NumberFormatException ignored) {
+        }
+        Log.warn("bad " + key + "=" + v + ", using " + def);
+        return def;
+    }
+
+    private static boolean bool(Properties p, String key, boolean def) {
+        String v = p.getProperty(key);
+        if (v == null) {
+            return def;
+        }
+        v = v.trim().toLowerCase();
+        if (v.equals("true") || v.equals("false")) {
+            return v.equals("true");
         }
         Log.warn("bad " + key + "=" + v + ", using " + def);
         return def;

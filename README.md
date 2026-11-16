@@ -20,8 +20,8 @@ zoom is on for `IsoPlayer.getPlayerIndex()` (and zoom is enabled, there is a cam
 otherwise vanilla runs (manual zoom, the tutorial turning auto zoom off). Situations are vanilla
 `shouldAutoZoomIn()` split in two: indoors (square not outside), melee (outside, not
 running/sprinting, zombie < 6 tiles targeting or targeted in the last 4 s), outdoors (the rest).
-The camera pan offset (`getRightClickOffX/Y` / 300, up to +100%, capped at 250%), the zoom step
-(0.006 per frame at normal speed) and `camera.center()` are vanilla. Only public members of
+The camera pan offset (`getRightClickOffX/Y` / 300, up to +100%, capped at 250%), the top zoom
+speed (0.006 per frame at 60 fps) and `camera.center()` are vanilla; the motion is not (below). Only public members of
 `MultiTextureFBO2` are used (`setTargetZoom`, `getZoom`, `setZoom`, `autoZoom`, `zoomEnabled`).
 
 Levels: `~/Zomboid/AutoZoomTweaks.properties` (`player1..4.indoors|melee|outdoors|vehicle`, percent
@@ -39,7 +39,41 @@ Vanilla: in a vehicle the target is always `getMaxZoom()`, at any speed, and the
 ignored. Patch (`AutoZoom.target`): linear from the player's Outdoors level at 0 km/h to the
 Vehicle level at `vehicleSpeedKmh` (80, properties only) in
 `BaseVehicle.getCurrentAbsoluteSpeedKmHour()`; drivers and passengers alike, camera pan still
-ignored. The vanilla step smooths the moving target.
+ignored. The speed is low-pass filtered first (`vehicleSpeedSmoothing`, 1.5 s time constant):
+cruise control keeps speeding up and slowing down a little, and the raw speed made the target
+wobble all the time.
+
+### Smooth zoom motion
+
+Vanilla (`MultiTextureFBO2.update`): the zoom moves toward the target at a constant step and
+flips direction the very frame the target crosses it. With a target that follows the vehicle
+speed this jerked the camera on every touch of gas or brake. Patch (`AutoZoom.step`): the zoom
+has a velocity that changes by at most `zoomAcceleration` (0.4/s²) per second, tops out at the
+vanilla speed (0.36/s) and is capped by `sqrt(2 a d)` so it brakes to stop at the target; when
+the target turns around it slows down first. Real time (`getRealworldSecondsSinceLastUpdate`),
+so the motion does not depend on FPS. Any zoom change from outside (manual zoom while auto zoom
+was off) restarts it from rest. Applies to every situation, so indoor/outdoor switches ease in
+and out too.
+
+### Steady zoom while aiming a firearm
+
+Vanilla: the situation is checked every frame, aiming or not. Stopping to aim ends the
+running exception and a zombie within 6 tiles that targets the player switches to the melee
+level, so the zoom moves the world under the crosshair exactly while the player lines up a
+shot. Patch (`AutoZoom.target`): while `isAiming()` with an aimed firearm in the primary hand
+(`HandWeapon.isAimedFirearm`), and `aimFreezeDelay` (1 s) after, the situation level is held at
+the point where the zoom comes to rest (`zoom + v|v| / 2a`, no swing back). Melee weapons are
+not affected: zooming in for melee is the point of the melee level. `aimFreeze=false` turns it off.
+
+### Camera pan zoom (experimental)
+
+Vanilla: the target grows by the camera pan distance / 300, up to +100%. With the mouse and
+"Pan camera while aiming" every aim pans toward the cursor (`PlayerCamera.update`), so the zoom
+follows the crosshair and moves what it points at. `panZoom=vanilla` (default) keeps that.
+`panZoom=fixed`: `panZoomAmount` (50%) while the pan offset is over 30 px and the pan is on
+purpose (gamepad RB, the pan camera key), nothing for the automatic aim pan (player 0, no
+gamepad, pan key not held, the option on). Not `JoypadManager.isRBPressed`: GamepadTweaks remaps
+it only inside `PlayerCamera.update`, so the pan offset itself tells. To be decided after a test.
 
 ### Options table
 
